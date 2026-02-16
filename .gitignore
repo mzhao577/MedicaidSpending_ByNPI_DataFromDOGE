@@ -1,0 +1,32 @@
+# Large data files (too big for GitHub)
+*.parquet
+billing_npi_summary.csv
+billing_npi_summary.xlsx
+monthly_trend_top1000.csv
+
+# Personal/local files
+Myinstructions.txt
+things2do.txt
+*.pptx
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.env
+venv/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
