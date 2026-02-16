@@ -110,17 +110,12 @@ try:
     df, npi_names, npi_totals, npi_list = load_data()
     total_npis = len(npi_list)
 
+    # Initialize session state
+    if 'rank' not in st.session_state:
+        st.session_state.rank = 1
+
     # Sidebar controls
     st.sidebar.header("Navigation")
-
-    # Slider for NPI selection
-    rank = st.sidebar.slider(
-        "Select NPI Rank",
-        min_value=1,
-        max_value=total_npis,
-        value=1,
-        help="Rank 1 = highest total spending"
-    )
 
     # Navigation buttons
     st.sidebar.markdown("### Navigate")
@@ -129,38 +124,40 @@ try:
     col1, col2 = st.sidebar.columns(2)
     with col1:
         if st.button("◀ Previous"):
-            new_rank = max(1, rank - 1)
-            st.session_state.rank = new_rank
-            st.rerun()
+            if st.session_state.rank > 1:
+                st.session_state.rank -= 1
     with col2:
         if st.button("Next ▶"):
-            new_rank = min(total_npis, rank + 1)
-            st.session_state.rank = new_rank
-            st.rerun()
+            if st.session_state.rank < total_npis:
+                st.session_state.rank += 1
 
     # -10 / +10 (jump by 10)
     col3, col4 = st.sidebar.columns(2)
     with col3:
         if st.button("◀◀ -10"):
-            new_rank = max(1, rank - 10)
-            st.session_state.rank = new_rank
-            st.rerun()
+            st.session_state.rank = max(1, st.session_state.rank - 10)
     with col4:
         if st.button("+10 ▶▶"):
-            new_rank = min(total_npis, rank + 10)
-            st.session_state.rank = new_rank
-            st.rerun()
+            st.session_state.rank = min(total_npis, st.session_state.rank + 10)
 
     # First / Last
     col5, col6 = st.sidebar.columns(2)
     with col5:
         if st.button("⏮ First"):
             st.session_state.rank = 1
-            st.rerun()
     with col6:
         if st.button("Last ⏭"):
             st.session_state.rank = total_npis
-            st.rerun()
+
+    # Slider for NPI selection (connected to session state)
+    rank = st.sidebar.slider(
+        "Select NPI Rank",
+        min_value=1,
+        max_value=total_npis,
+        value=st.session_state.rank,
+        key="rank",
+        help="Rank 1 = highest total spending"
+    )
 
     # Get current NPI info
     current_idx = rank - 1
