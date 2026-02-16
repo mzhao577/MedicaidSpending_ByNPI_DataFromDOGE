@@ -122,46 +122,45 @@ try:
         help="Rank 1 = highest total spending"
     )
 
-    # Quick jump buttons
-    st.sidebar.markdown("### Quick Jump")
+    # Navigation buttons
+    st.sidebar.markdown("### Navigate")
+
+    # Previous / Next (single step)
     col1, col2 = st.sidebar.columns(2)
     with col1:
-        if st.button("⏮ First"):
-            st.session_state.rank = 1
+        if st.button("◀ Previous"):
+            new_rank = max(1, rank - 1)
+            st.session_state.rank = new_rank
             st.rerun()
     with col2:
-        if st.button("⏭ Last"):
-            st.session_state.rank = total_npis
+        if st.button("Next ▶"):
+            new_rank = min(total_npis, rank + 1)
+            st.session_state.rank = new_rank
             st.rerun()
 
+    # -10 / +10 (jump by 10)
     col3, col4 = st.sidebar.columns(2)
     with col3:
-        if st.button("◀ -10"):
+        if st.button("◀◀ -10"):
             new_rank = max(1, rank - 10)
             st.session_state.rank = new_rank
             st.rerun()
     with col4:
-        if st.button("▶ +10"):
+        if st.button("+10 ▶▶"):
             new_rank = min(total_npis, rank + 10)
             st.session_state.rank = new_rank
             st.rerun()
 
-    # Search by NPI
-    st.sidebar.markdown("### Search")
-    search_npi = st.sidebar.text_input("Enter NPI number:")
-    if search_npi:
-        try:
-            search_npi_int = int(search_npi)
-            if search_npi_int in npi_list:
-                found_rank = npi_list.index(search_npi_int) + 1
-                st.sidebar.success(f"Found at rank {found_rank}")
-                if st.sidebar.button("Go to this NPI"):
-                    st.session_state.rank = found_rank
-                    st.rerun()
-            else:
-                st.sidebar.warning("NPI not in top 1000")
-        except ValueError:
-            st.sidebar.error("Invalid NPI format")
+    # First / Last
+    col5, col6 = st.sidebar.columns(2)
+    with col5:
+        if st.button("⏮ First"):
+            st.session_state.rank = 1
+            st.rerun()
+    with col6:
+        if st.button("Last ⏭"):
+            st.session_state.rank = total_npis
+            st.rerun()
 
     # Get current NPI info
     current_idx = rank - 1
@@ -182,12 +181,6 @@ try:
     fig = plot_npi_trends(df, npi, npi_name, npi_total, rank, total_npis)
     st.pyplot(fig)
     plt.close(fig)
-
-    # Data table (expandable)
-    with st.expander("View Raw Data"):
-        npi_data = df[df['billing_npi'] == npi][['month', 'total_paid', 'total_claims', 'total_beneficiaries']]
-        npi_data = npi_data.sort_values('month')
-        st.dataframe(npi_data, use_container_width=True)
 
     # Footer
     st.markdown("---")
